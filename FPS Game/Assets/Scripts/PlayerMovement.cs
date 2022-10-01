@@ -30,6 +30,8 @@ public class PlayerMovement : MonoBehaviour
     public float gravityAcceleration;
     float downwardSpeed = 0;
     float jumpSpeed = 0;
+    bool startJump = false;
+     float jumpForce;
 
 
     // Start is called before the first frame update
@@ -104,9 +106,14 @@ public class PlayerMovement : MonoBehaviour
         }
 
         //Making character move
+        
+        Vector3 vel = rb.velocity;
+
         if (movingV && movingH) {
+            
             float speedTempV = Mathf.Sqrt((Mathf.Abs(currentSpeedV) * Mathf.Abs(currentSpeedV))/2); //Idfk wat this does tbh
             float speedTempH = Mathf.Sqrt((Mathf.Abs(currentSpeedH) * Mathf.Abs(currentSpeedH))/2); //It just worked
+
 
             if (HorizontalMovement > 0) {
                 if (VerticalMovement > 0) {
@@ -125,43 +132,43 @@ public class PlayerMovement : MonoBehaviour
             rb.velocity = (transform.forward * currentSpeedV * 10f + transform.right * currentSpeedH * 10f) * speed;
             
         }
+        Vector3 vel2 = new Vector3(rb.velocity.x, 0f, rb.velocity.z);
 
-
-
-        //Gravity
-        if (!grounded) {
-            downwardSpeed -= gravityAcceleration * Time.deltaTime;
-            float tempDown = downwardSpeed;
-            downwardSpeed += jumpSpeed;
-            jumpSpeed += tempDown;
-
-            rb.velocity = new Vector3(rb.velocity.x, downwardSpeed, rb.velocity.z);
+        if (startJump) {
+            vel.y += jumpForce;
+            rb.velocity = new Vector3(vel2.x, vel.y, vel2.z);
+            startJump = false;
         } else {
-            downwardSpeed = 0;
+            rb.velocity = new Vector3(vel2.x, vel.y, vel2.z);
         }
+
+        
+
+
 
 
 
         //Jumping
         if (Input.GetKeyDown(KeyCode.Space) && grounded) {
-
             float jumpForce = Mathf.Sqrt(19.6f * jumpHeight);
-            rb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
-            jumpSpeed = rb.velocity.y;
-        }
+            startJump = true;
 
+            
+        }
     }
 
 
     void OnTriggerEnter(Collider col) {
         if (col.gameObject.layer == 6) {
             grounded = true;
+            Debug.Log("grounded");
         }
     }
 
     void OnTriggerExit(Collider col) {
         if (col.gameObject.layer == 6) {
             grounded = false;
+            Debug.Log("not grounded");
         }
     }
 }
