@@ -26,12 +26,8 @@ public class PlayerMovement : MonoBehaviour
 
     //Jumping
     bool grounded; 
-    public float jumpHeight;
-    public float gravityAcceleration;
-    float downwardSpeed = 0;
-    float jumpSpeed = 0;
     bool startJump = false;
-     float jumpForce;
+    public float jumpForce;
 
 
     // Start is called before the first frame update
@@ -150,10 +146,7 @@ public class PlayerMovement : MonoBehaviour
 
         //Jumping
         if (Input.GetKeyDown(KeyCode.Space) && grounded) {
-            float jumpForce = Mathf.Sqrt(19.6f * jumpHeight);
             startJump = true;
-
-            
         }
     }
 
@@ -161,14 +154,12 @@ public class PlayerMovement : MonoBehaviour
     void OnTriggerEnter(Collider col) {
         if (col.gameObject.layer == 6) {
             grounded = true;
-            Debug.Log("grounded");
         }
     }
 
     void OnTriggerExit(Collider col) {
         if (col.gameObject.layer == 6) {
             grounded = false;
-            Debug.Log("not grounded");
         }
     }
 }
