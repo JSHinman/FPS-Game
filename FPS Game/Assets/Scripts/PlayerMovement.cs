@@ -27,6 +27,9 @@ public class PlayerMovement : MonoBehaviour
     //Jumping
     bool grounded; 
     public float jumpHeight;
+    public float gravityAcceleration;
+    float downwardSpeed = 0;
+    float jumpSpeed = 0;
 
 
     // Start is called before the first frame update
@@ -40,6 +43,7 @@ public class PlayerMovement : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        
         //Camera Movement
         float mouseX = Input.GetAxisRaw("Mouse X") * Time.deltaTime * sensitivity * 100f;
         float mouseY = Input.GetAxisRaw("Mouse Y") * Time.deltaTime * -sensitivity * 100f;
@@ -106,7 +110,7 @@ public class PlayerMovement : MonoBehaviour
 
             if (HorizontalMovement > 0) {
                 if (VerticalMovement > 0) {
-                    rb.velocity = (transform.forward * speedTempV * 10f + transform.right * speedTempH * 10f) * speed;
+                    rb.velocity = (transform.forward * speedTempV * 10f + transform.right * speedTempH * 10) * speed;
                 } else {
                     rb.velocity = (transform.forward * -speedTempV * 10f + transform.right * speedTempH * 10f) * speed;
                 }
@@ -119,15 +123,31 @@ public class PlayerMovement : MonoBehaviour
             }
         } else {
             rb.velocity = (transform.forward * currentSpeedV * 10f + transform.right * currentSpeedH * 10f) * speed;
+            
         }
-        
+
+
+
+        //Gravity
+        if (!grounded) {
+            downwardSpeed -= gravityAcceleration * Time.deltaTime;
+            float tempDown = downwardSpeed;
+            downwardSpeed += jumpSpeed;
+            jumpSpeed += tempDown;
+
+            rb.velocity = new Vector3(rb.velocity.x, downwardSpeed, rb.velocity.z);
+        } else {
+            downwardSpeed = 0;
+        }
+
+
 
         //Jumping
         if (Input.GetKeyDown(KeyCode.Space) && grounded) {
 
             float jumpForce = Mathf.Sqrt(19.6f * jumpHeight);
             rb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
-            
+            jumpSpeed = rb.velocity.y;
         }
 
     }
